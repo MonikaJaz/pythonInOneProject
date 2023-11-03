@@ -13,6 +13,27 @@ symbol_count = {  # dzila podobnie jak haszmapa w javie ( klucz - wartosc )
     "C": 6,
     "D": 8
 }
+symbol_value = {  # dzila podobnie jak haszmapa w javie ( klucz - wartosc )
+    "A": 5,
+    "B": 4,
+    "C": 3,
+    "D": 2
+}
+
+
+def check_winnings(columns, lines, bet, values):
+    winnings = 0
+    winning_lines = []
+    for line in range(lines):
+        symbol = columns[0][line]  # symbol - pierwsza kolumna i pierwszy wiersz
+        for column in columns:
+            symbol_to_check = column[line]
+            if symbol != symbol_to_check:
+                break  # jezeli poprzedni symbol w wierszu jest inny od nastepnegp
+        else:
+            winnings += values[symbol] * bet  # wygrana to wartosc symbolu (symbols_value) pomnozona przez zaklad
+            winning_lines.append(line + 1)
+    return winnings, winning_lines
 
 
 def get_slot_machine_spin(rows, cols, symbols):
@@ -20,6 +41,7 @@ def get_slot_machine_spin(rows, cols, symbols):
     for symbol, symbol_count in symbols.items():
         for _ in range(symbol_count):
             all_symbols.append(symbol)
+
     columns = []  # tworzymy liste kolumn
     for _ in range(cols):  # tworzymy pętle ktora bedzie iterowac przez kazda kolumne w liscie kolumn
         column = []
@@ -32,6 +54,16 @@ def get_slot_machine_spin(rows, cols, symbols):
             column.append(value)
         columns.append(column)
     return columns
+
+
+def print_slot_machine(columns):
+    for row in range(len(columns[0])):
+        for i, column in enumerate(columns):
+            if i != len(columns) - 1:
+                print(column[row], end=" | ")  # end sprawia ze jest nowa linia
+            else:
+                print(column[row], end="")
+        print()
 
 
 def deposit():
@@ -74,10 +106,7 @@ def getBet():
         else:
             print("Please enter a number!")
     return amount
-
-
-def main():
-    balance = deposit()  # wywolanie funkcji
+def spin(balance):
     lines = get_number_of_lines()
     while True:
         bet = getBet()
@@ -87,6 +116,23 @@ def main():
         else:
             break
     print(f"You are betting ${bet} on {lines} lines. Total bet is equal to: $ {total_bet}")
+
+    slots = get_slot_machine_spin(ROWS, COLS, symbol_count)
+    print_slot_machine(slots)
+    winnings, winning_lines = check_winnings(slots, lines, bet, symbol_value)
+    print(f"You won ${winnings}. ")
+    print(f"You won on lines: ", *winning_lines)  # gwiazdka oznacza unpack operator
+    return winnings- total_bet
+
+def main():
+    balance = deposit()  # wywolanie funkcji
+    while True:
+        print(f"Current balance is ${balance}")
+        answer10 = input("Press enter to play (q to quit).")
+        if spin == "q":
+            break
+        balance += spin(balance)
+    print(f"You left with ${balance}")
 
 
 main()
